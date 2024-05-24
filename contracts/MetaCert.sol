@@ -51,4 +51,12 @@ contract MetaCert is Ownable, ERC721URIStorage {
         _nextTokenId = _nextTokenId+1;
         return true;
     }
+
+    function verifyCert(address _addHolder, uint256 _tokenUid) public returns(bool) {
+        if (ownerOf(_tokenUid) == _addHolder) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
