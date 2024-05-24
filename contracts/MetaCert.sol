@@ -9,7 +9,10 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MetaCert is Ownable, ERC721URIStorage {
 
-    constructor() Ownable(msg.sender) ERC721("MetaCert certs", "MCC") {}
+    constructor() Ownable(msg.sender) ERC721("MetaCert certs", "MCC") {
+        _nextTokenId = 0;
+        _nextIssuerUid = 0;
+    }
 
     //events
     event certMinted(uint256 _tokenUid);
@@ -22,8 +25,8 @@ contract MetaCert is Ownable, ERC721URIStorage {
         uint256 issuer_uid_govt;
     }
 
-    uint256 private _nextTokenId = 0;
-    uint256 private _nextIssuerUid = 0;
+    uint256 private _nextTokenId;
+    uint256 private _nextIssuerUid;
 
     mapping(uint256 => Issuer) public IssuerMapping;
 
