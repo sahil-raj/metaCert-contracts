@@ -2,6 +2,7 @@
 //contracts/MetaCert.sol
 
 //sepolia: 0x5dEcd7CA736f6Bb41304597D1D15133617a7c331
+//v2 sepolia: 0x9Dc51E8Cfc9F88385376a685Bf7997426467f487
 
 pragma solidity ^0.8.4;
 
@@ -12,12 +13,11 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 contract MetaCert is Ownable, ERC721URIStorage {
 
     constructor() Ownable(msg.sender) ERC721("MetaCert certs", "MCC") {
-        _nextTokenId = 0;
-        _nextIssuerUid = 0;
     }
 
     //events
     event certMinted(uint256 _tokenUid);
+    event issuerRegistered(uint256 _issuerId);
 
     //state vars
     struct Issuer {
@@ -27,8 +27,8 @@ contract MetaCert is Ownable, ERC721URIStorage {
         uint256 issuer_uid_govt;
     }
 
-    uint256 private _nextTokenId;
-    uint256 private _nextIssuerUid;
+    uint256 private _nextTokenId = 0;
+    uint256 private _nextIssuerUid = 0;
 
     mapping(uint256 => Issuer) public IssuerMapping;
 
@@ -46,13 +46,18 @@ contract MetaCert is Ownable, ERC721URIStorage {
         _;
     }
 
+    modifier verifyCertMod(uint256 _tokenUid) {
+        // require(_exists(_tokenUid), "Token don't exist");
+        _;
+    }
+
     //functions
     function registerIssuer(string memory _name, string memory _issuerAddress, uint256 _issuerUidGovt, uint256 _isVerified) registerIssuerMod(_name, _issuerAddress, _issuerUidGovt, _isVerified) public returns(uint256) {
 
         Issuer memory i = Issuer(msg.sender, _name, _issuerAddress, _issuerUidGovt);
         IssuerMapping[_nextIssuerUid] = i;
-        _nextIssuerUid = _nextIssuerUid+1;
-
+        _nextIssuerUid += 1;
+        emit issuerRegistered(_nextIssuerUid-1);
         return _nextIssuerUid-1;
     }
 
@@ -60,12 +65,13 @@ contract MetaCert is Ownable, ERC721URIStorage {
         _mint(_to, _nextTokenId);
         _setTokenURI(_nextTokenId, _uri);
         emit certMinted(_nextTokenId);
-        _nextTokenId = _nextTokenId+1;
+        // _nextTokenId = _nextTokenId+1;
+        _nextTokenId += 1;
         return true;
     }
 
-    function verifyCert(address _addHolder, uint256 _tokenUid) public view returns(bool) {
-        if (ownerOf(_tokenUid) == _addHolder) {
+    function verifyCert(address _addHolder, uint256 _tokenUid) public verifyCertMod(_tokenUid) view returns(bool) {
+        if (_ownerOf(_tokenUid) == _addHolder) {
             return true;
         } else {
             return false;
