@@ -13,5 +13,9 @@ module.exports = {
       url: `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
       accounts: [`${SEPOLIA_ACCOUNT_PRIVATE_KEY}`],
     },
+    cscTestnet: {
+      url: `https://testnet-rpc.coinex.net/`,
+      accounts: [`${SEPOLIA_ACCOUNT_PRIVATE_KEY}`],
+    }
   },
 };
